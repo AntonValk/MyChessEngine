@@ -20,7 +20,7 @@ public abstract class Tile {
 
 	protected final int tileCoordinate;	// can only be accessed by its sub-classes, cannot be modified
 
-	private static final Map<Integer, EmptyTile> EMPTY_TILES = createAllPossibleEmptyTiles();
+	private static final Map<Integer, EmptyTile> EMPTY_TILES_CACHE = createAllPossibleEmptyTiles();
 		
 	private static Map<Integer, EmptyTile> createAllPossibleEmptyTiles(){
 		
@@ -30,7 +30,7 @@ public abstract class Tile {
 			emptyTileMap.put(i,  new EmptyTile(i));
 		}
 		
-		return ImmutableMap.copyOf(emptyTileMap);	
+		return ImmutableMap.copyOf(emptyTileMap); // Could have used Collections.unmodifiableMap(emptyTileMap);	
 		// This makes use of Guava library; could have also used return emptyTileMap;
 		// ImmutableMap is used so that the map cannot be modified.
 		
@@ -48,7 +48,7 @@ public abstract class Tile {
 		 *	else
     	 *		opening_time = 9;
 		 */
-		return piece != null ? new OccupiedTile(tileCoordinate, piece):EMPTY_TILES.get(tileCoordinate);
+		return piece != null ? new OccupiedTile(tileCoordinate, piece): EMPTY_TILES_CACHE.get(tileCoordinate);
 	}
 	
 	private Tile(int tileCoordinate){
@@ -61,7 +61,7 @@ public abstract class Tile {
 
 	public static final class EmptyTile extends Tile{
 
-		EmptyTile(final int coordinate){
+		private EmptyTile(final int coordinate){
 			super(coordinate);
 		}
 
@@ -81,7 +81,7 @@ public abstract class Tile {
 		
 		private final Piece pieceOnTile;	// cannot reference variable from outside unless getPiece gets called.
 		
-		OccupiedTile(int coordinate, Piece pieceOnTile){
+		private OccupiedTile(int coordinate, Piece pieceOnTile){
 			super(coordinate);
 			this.pieceOnTile = pieceOnTile;
 		}
